@@ -30,7 +30,6 @@ import java.net.URL;
 public class NetworkServices extends IntentService {
     public static final String MESSAGE = "messenger";
     public static final String TYPE = "type";
-    public static final String USER_ID = "user";
 
     public NetworkServices() {
         super("NetworkServices");
@@ -47,7 +46,7 @@ public class NetworkServices extends IntentService {
         if (getType == 0){
             url = "https://api.flickr.com/services/rest/?method=flickr.photos.getRecent&api_key=48e35c7d6af648edda8f9de6cc9bdca2&format=json&nojsoncallback=1";
         } else if (getType == 1) {
-            String getUserID = extra.getString(USER_ID);
+            String getUserID = "hi";
             url = "https://api.flickr.com/services/rest/?method=flickr.photos.getInfo&api_key=48e35c7d6af648edda8f9de6cc9bdca2&photo_id=" + getUserID + "&format=json&nojsoncallback=1";
         }
 
@@ -90,6 +89,7 @@ public class NetworkServices extends IntentService {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
         Message message = Message.obtain();
         message.arg1 = Activity.RESULT_OK;
         message.obj = "Service is Done";

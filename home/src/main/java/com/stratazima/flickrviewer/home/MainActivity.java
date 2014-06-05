@@ -8,6 +8,7 @@ package com.stratazima.flickrviewer.home;
  */
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,15 +17,21 @@ import android.os.Messenger;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
+import com.stratazima.flickrviewer.processes.JSONStorage;
 import com.stratazima.flickrviewer.processes.NetworkServices;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.*;
 
 
 public class MainActivity extends Activity {
     public static final String MESSAGE = "messenger";
     public static final String TYPE = "type";
-    public static final String USER_ID = "user";
     private Menu refreshMenu;
     private Handler daHandle;
+    JSONStorage jsonStorage = JSONStorage.getInstance(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,13 +41,17 @@ public class MainActivity extends Activity {
         daHandle = new Handler() {
             String response = null;
 
+            /**
+             * Handler that saves/overwrites the file and makes a toast
+             * for debug reasons and give user feedback.
+             * Will remove later on.
+             */
             @Override
             public void handleMessage(Message msg) {
                 if (msg.arg1 == RESULT_OK && msg.obj != null) {
-                    try {
-                        response = (String) msg.obj;
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    if (jsonStorage.onWriteFile((String) msg.obj)) {
+                        Toast toast = Toast.makeText(getApplicationContext(), "Success!", Toast.LENGTH_SHORT);
+                        toast.show();
                     }
                     setProgressBar(false);
                 }}
@@ -68,6 +79,7 @@ public class MainActivity extends Activity {
      * with an animation to give the user a sense
      * of progress.
      */
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         refreshMenu = menu;
@@ -96,5 +108,31 @@ public class MainActivity extends Activity {
                 }
             }
         }
+    }
+
+    /**
+     * Handles Reading of the file
+     */
+
+    private JSONObject onReadFile() {
+        JSONObject daObject = null;
+        String rand = null;
+        try {
+            FileInputStream fis = openFileInput("flickr.json");
+            InputStreamReader isr = new InputStreamReader(fis);
+
+            fis.read(rand.getBytes());
+            fis.close();
+
+            daObject = new JSONObject(rand);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return daObject;
     }
 }
