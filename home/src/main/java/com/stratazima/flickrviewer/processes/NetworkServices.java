@@ -84,8 +84,8 @@ public class NetworkServices extends IntentService {
 
         JSONObject[] objects = null;
         if (daObj != null) {
-            objects = new JSONObject[25];
-            for (int i = 0; i < 25; i++) {
+            objects = new JSONObject[20];
+            for (int i = 0; i < 20; i++) {
                 objects[i] = new JSONObject();
                 JSONObject temp = null;
 

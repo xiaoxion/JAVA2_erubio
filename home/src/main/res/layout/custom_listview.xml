@@ -9,7 +9,9 @@
             android:layout_width="75dp"
             android:layout_height="75dp"
             android:id="@+id/flickr_image"
-            android:layout_margin="15dp" android:src="@drawable/ic_launcher"/>
+            android:layout_margin="15dp"
+            android:src="@drawable/ic_launcher"
+            android:contentDescription="@string/image_title"/>
     <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"

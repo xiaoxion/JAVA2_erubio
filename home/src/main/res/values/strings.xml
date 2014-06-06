@@ -6,5 +6,6 @@
     <string name="header_main">Recent Flickr Photos</string>
     <string name="header_explain1">View the most recent photos that Flickr</string>
     <string name="header_explain2">users have uploaded.</string>
+    <string name="image_title">Flickr Image</string>
 
 </resources>

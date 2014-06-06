@@ -21,15 +21,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
+import com.stratazima.flickrviewer.processes.CustomList;
 import com.stratazima.flickrviewer.processes.DataStorage;
 import com.stratazima.flickrviewer.processes.NetworkServices;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 
 
 public class MainActivity extends Activity {
@@ -66,10 +65,21 @@ public class MainActivity extends Activity {
                         toast.show();
                     }
                     setProgressBar(false);
+                    onListCreate();
                 }}
         };
 
         onListCreate();
+
+        if (isNetworkOnline()){
+            final Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    onRefresh();
+                }
+            }, 2000);
+        }
     }
 
     /**
@@ -79,6 +89,7 @@ public class MainActivity extends Activity {
      */
 
     private void onRefresh(){
+        setProgressBar(true);
         Messenger refreshMessenger = new Messenger(mHandle);
         Intent networkIntent = new Intent(this, NetworkServices.class);
         networkIntent.putExtra(MESSAGE, refreshMessenger);
@@ -103,7 +114,6 @@ public class MainActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_refresh) {
-            setProgressBar(true);
             onRefresh();
         }
         return true;
@@ -143,8 +153,7 @@ public class MainActivity extends Activity {
         mContext = getApplicationContext();
         jsonStorage = DataStorage.getInstance(mContext);
         JSONArray daJSONArray = null;
-
-        ArrayList<HashMap<String,String>> mylist = new ArrayList<HashMap<String, String>>();
+        ArrayList<HashMap<String,String>> myList = new ArrayList<HashMap<String, String>>();
 
         /**
          * Checks the network state and runs the appropriate view.
@@ -155,26 +164,15 @@ public class MainActivity extends Activity {
         if (isNetworkOnline()) {
             if (jsonStorage.onCheckFile()) {
                 daJSONArray = jsonStorage.onReadFile();
-
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        onRefresh();
-                    }
-                }, 3000);
-
-                daJSONArray = jsonStorage.onReadFile();
-            } else {
-                onRefresh();
-                daJSONArray = jsonStorage.onReadFile();
             }
         } else {
-            if (jsonStorage.onCheckFile()) {
-                daJSONArray = jsonStorage.onReadFile();
-            }
             Toast toast = Toast.makeText(getApplicationContext(), "Please Connect to Network", Toast.LENGTH_SHORT);
             toast.show();
+            if (jsonStorage.onCheckFile()) {
+                daJSONArray = jsonStorage.onReadFile();
+            } else {
+                return;
+            }
         }
 
         if(daJSONArray != null) {
@@ -204,10 +202,12 @@ public class MainActivity extends Activity {
                 displayMap.put("title", title);
                 displayMap.put("imageURL", imageURL);
 
-                mylist.add(displayMap);
+                myList.add(displayMap);
             }
 
-            SimpleAdapter adapter = new SimpleAdapter(this, mylist, R.layout.custom_listview, new String[] {"username", "title"} , new int[]{R.id.main_row, R.id.sub_row});
+            String[] strings = new String[myList.size()];
+            String[] values = {"username", "title","imageURL"};
+            CustomList adapter = new CustomList(this, strings, values, myList);
             listView.setAdapter(adapter);
         }
     }
