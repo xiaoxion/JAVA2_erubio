@@ -10,6 +10,8 @@ package com.stratazima.flickrviewer.home;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -18,29 +20,23 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
-import com.stratazima.flickrviewer.processes.JSONStorage;
+import com.stratazima.flickrviewer.processes.DataStorage;
 import com.stratazima.flickrviewer.processes.NetworkServices;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.*;
 
 
 public class MainActivity extends Activity {
     public static final String MESSAGE = "messenger";
-    public static final String TYPE = "type";
     private Menu refreshMenu;
-    private Handler daHandle;
-    JSONStorage jsonStorage = JSONStorage.getInstance(this);
+    private Handler mHandle;
+    private Context mContext;
+    DataStorage jsonStorage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        daHandle = new Handler() {
-            String response = null;
-
+        mHandle = new Handler() {
             /**
              * Handler that saves/overwrites the file and makes a toast
              * for debug reasons and give user feedback.
@@ -49,14 +45,43 @@ public class MainActivity extends Activity {
             @Override
             public void handleMessage(Message msg) {
                 if (msg.arg1 == RESULT_OK && msg.obj != null) {
-                    if (jsonStorage.onWriteFile((String) msg.obj)) {
-                        Toast toast = Toast.makeText(getApplicationContext(), "Success!", Toast.LENGTH_SHORT);
+                    mContext = getApplicationContext();
+                    jsonStorage = DataStorage.getInstance(mContext);
+                    String temp = (String) msg.obj;
+                    if (jsonStorage.onWriteFile(temp)) {
+                        Toast toast = Toast.makeText(getApplicationContext(), "Loaded", Toast.LENGTH_SHORT);
                         toast.show();
                     }
                     setProgressBar(false);
                 }}
         };
-        onRefresh();
+        mContext = getApplicationContext();
+        jsonStorage = DataStorage.getInstance(mContext);
+
+        if (isNetworkOnline()) {
+            if (jsonStorage.onCheckFile()) {
+                jsonStorage.onReadFile();
+
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        onRefresh();
+                        jsonStorage.onReadFile();
+                    }
+                }, 3000);
+
+            } else {
+                onRefresh();
+                jsonStorage.onReadFile();
+            }
+        } else {
+            if (jsonStorage.onCheckFile()) {
+                jsonStorage.onReadFile();
+            }
+            Toast toast = Toast.makeText(getApplicationContext(), "Please Connect to Network", Toast.LENGTH_SHORT);
+            toast.show();
+        }
     }
 
     /**
@@ -66,10 +91,9 @@ public class MainActivity extends Activity {
      */
 
     private void onRefresh(){
-        Messenger refreshMessenger = new Messenger(daHandle);
+        Messenger refreshMessenger = new Messenger(mHandle);
         Intent networkIntent = new Intent(this, NetworkServices.class);
         networkIntent.putExtra(MESSAGE, refreshMessenger);
-        networkIntent.putExtra(TYPE, 0);
         startService(networkIntent);
     }
 
@@ -111,28 +135,19 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * Handles Reading of the file
+     * Checks if network is online
      */
 
-    private JSONObject onReadFile() {
-        JSONObject daObject = null;
-        String rand = null;
-        try {
-            FileInputStream fis = openFileInput("flickr.json");
-            InputStreamReader isr = new InputStreamReader(fis);
-
-            fis.read(rand.getBytes());
-            fis.close();
-
-            daObject = new JSONObject(rand);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
+    public boolean isNetworkOnline() {
+        boolean status = false;
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        if (netInfo != null) {
+            if (netInfo.isConnected()) {
+                status= true;
+            }
         }
 
-        return daObject;
+        return status;
     }
 }

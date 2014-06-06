@@ -1,10 +1,15 @@
 package com.stratazima.flickrviewer.processes;
 
 import android.content.Context;
+import android.util.JsonReader;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Project FlickrViewer
@@ -12,25 +17,34 @@ import java.io.*;
  * Author  Esau
  * Date    6/4/2014
  */
-public final class JSONStorage implements Cloneable {
-    private static JSONStorage mInstance;
+public final class DataStorage implements Cloneable {
+    private static DataStorage mInstance;
     private static Context mContext;
 
-    private JSONStorage() {}
+    private DataStorage() {}
 
-    public static JSONStorage getInstance(Context context) {
+    public static DataStorage getInstance(Context context) {
         if(mInstance == null) {
-            mInstance = new JSONStorage();
+            mInstance = new DataStorage();
         }
         mContext = context.getApplicationContext();
         return mInstance;
+    }
+
+    public boolean onCheckFile() {
+        Boolean fileExist = false;
+
+        File file = new File(mContext.getFilesDir().getPath() + "/flickr.txt");
+        if (file.exists()) fileExist = true;
+
+        return fileExist;
     }
 
 
     public boolean onWriteFile(String jsonObject) {
         boolean results = false;
         try {
-            FileOutputStream fos = mContext.openFileOutput("flickr.json", Context.MODE_PRIVATE);
+            FileOutputStream fos = mContext.openFileOutput("flickr.txt", Context.MODE_PRIVATE);
             fos.write(jsonObject.getBytes());
             fos.close();
             results = true;
@@ -43,25 +57,22 @@ public final class JSONStorage implements Cloneable {
         return results;
     }
 
-    public JSONObject onReadFile() {
-        JSONObject daObject = null;
+    public JSONArray onReadFile() {
+        JSONArray daObject = null;
         String content;
-        FileInputStream fis = null;
         try {
-            fis = mContext.openFileInput("flickr.json");
-            BufferedInputStream bis = new BufferedInputStream(fis);
-            byte[] contentBytes = new byte[1024];
-            int bytesRead = 0;
-            StringBuffer contentBuffer = new StringBuffer();
+            InputStream inputStream = mContext.openFileInput("flickr.txt");
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            StringBuilder contentBuffer = new StringBuilder();
 
-            while ((bytesRead - bis.read(contentBytes) != -1)) {
-                content = new String(contentBytes, 0, bytesRead);
+            while ((content = bufferedReader.readLine()) != null) {
                 contentBuffer.append(content);
             }
 
             content = contentBuffer.toString();
-            daObject = new JSONObject(content);
-            fis.close();
+            daObject = new JSONArray(content);
+            inputStream.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
