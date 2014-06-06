@@ -20,6 +20,7 @@ import java.util.Arrays;
 public final class DataStorage implements Cloneable {
     private static DataStorage mInstance;
     private static Context mContext;
+    JSONArray daObject = null;
 
     private DataStorage() {}
 
@@ -58,7 +59,6 @@ public final class DataStorage implements Cloneable {
     }
 
     public JSONArray onReadFile() {
-        JSONArray daObject = null;
         String content;
         try {
             InputStream inputStream = mContext.openFileInput("flickr.txt");

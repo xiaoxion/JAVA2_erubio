@@ -19,9 +19,17 @@ import android.os.Messenger;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
+import android.view.View;
+import android.widget.*;
 import com.stratazima.flickrviewer.processes.DataStorage;
 import com.stratazima.flickrviewer.processes.NetworkServices;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 
 public class MainActivity extends Activity {
@@ -30,11 +38,16 @@ public class MainActivity extends Activity {
     private Handler mHandle;
     private Context mContext;
     DataStorage jsonStorage;
+    ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        listView = (ListView) findViewById(R.id.listView);
+        View listHeader = this.getLayoutInflater().inflate(R.layout.header_listview, null);
+        listView.addHeaderView(listHeader);
 
         mHandle = new Handler() {
             /**
@@ -55,33 +68,8 @@ public class MainActivity extends Activity {
                     setProgressBar(false);
                 }}
         };
-        mContext = getApplicationContext();
-        jsonStorage = DataStorage.getInstance(mContext);
 
-        if (isNetworkOnline()) {
-            if (jsonStorage.onCheckFile()) {
-                jsonStorage.onReadFile();
-
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        onRefresh();
-                        jsonStorage.onReadFile();
-                    }
-                }, 3000);
-
-            } else {
-                onRefresh();
-                jsonStorage.onReadFile();
-            }
-        } else {
-            if (jsonStorage.onCheckFile()) {
-                jsonStorage.onReadFile();
-            }
-            Toast toast = Toast.makeText(getApplicationContext(), "Please Connect to Network", Toast.LENGTH_SHORT);
-            toast.show();
-        }
+        onListCreate();
     }
 
     /**
@@ -149,5 +137,78 @@ public class MainActivity extends Activity {
         }
 
         return status;
+    }
+
+    public void onListCreate() {
+        mContext = getApplicationContext();
+        jsonStorage = DataStorage.getInstance(mContext);
+        JSONArray daJSONArray = null;
+
+        ArrayList<HashMap<String,String>> mylist = new ArrayList<HashMap<String, String>>();
+
+        /**
+         * Checks the network state and runs the appropriate view.
+         * Also handles if there is data and no connection so the
+         * user can view their data.
+         */
+
+        if (isNetworkOnline()) {
+            if (jsonStorage.onCheckFile()) {
+                daJSONArray = jsonStorage.onReadFile();
+
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        onRefresh();
+                    }
+                }, 3000);
+
+                daJSONArray = jsonStorage.onReadFile();
+            } else {
+                onRefresh();
+                daJSONArray = jsonStorage.onReadFile();
+            }
+        } else {
+            if (jsonStorage.onCheckFile()) {
+                daJSONArray = jsonStorage.onReadFile();
+            }
+            Toast toast = Toast.makeText(getApplicationContext(), "Please Connect to Network", Toast.LENGTH_SHORT);
+            toast.show();
+        }
+
+        if(daJSONArray != null) {
+            String username = null;
+            String title = null;
+            String imageURL = null;
+
+            for (int i = 0; i < daJSONArray.length(); i++) {
+                JSONObject tempObj = null;
+                try {
+                    tempObj =  daJSONArray.getJSONObject(i);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if (tempObj != null) {
+                    try {
+                        username = tempObj.getString("username");
+                        title = tempObj.getString("title");
+                        imageURL = tempObj.getString("imageURL");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                HashMap<String,String> displayMap = new HashMap<String, String>();
+                displayMap.put("username", username);
+                displayMap.put("title", title);
+                displayMap.put("imageURL", imageURL);
+
+                mylist.add(displayMap);
+            }
+
+            SimpleAdapter adapter = new SimpleAdapter(this, mylist, R.layout.custom_listview, new String[] {"username", "title"} , new int[]{R.id.main_row, R.id.sub_row});
+            listView.setAdapter(adapter);
+        }
     }
 }

@@ -3,5 +3,8 @@
 
     <string name="app_name">FlickrViewer</string>
     <string name="action_refresh">Refresh</string>
+    <string name="header_main">Recent Flickr Photos</string>
+    <string name="header_explain1">View the most recent photos that Flickr</string>
+    <string name="header_explain2">users have uploaded.</string>
 
 </resources>
