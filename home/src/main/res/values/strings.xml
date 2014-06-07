@@ -8,4 +8,7 @@
     <string name="header_explain2">users have uploaded.</string>
     <string name="image_title">Flickr Image</string>
 
+    <string name="accept">Accept</string>
+    <string name="decline">Continue</string>
+
 </resources>

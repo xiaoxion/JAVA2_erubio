@@ -8,14 +8,18 @@ package com.stratazima.flickrviewer.home;
  */
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -38,6 +42,7 @@ public class MainActivity extends Activity {
     private Context mContext;
     DataStorage jsonStorage;
     ListView listView;
+    String TAG = "Main";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +84,8 @@ public class MainActivity extends Activity {
                     onRefresh();
                 }
             }, 2000);
+        } else {
+            onNoNetworkDialog("Need Network to Continue");
         }
     }
 
@@ -171,7 +178,7 @@ public class MainActivity extends Activity {
             if (jsonStorage.onCheckFile()) {
                 daJSONArray = jsonStorage.onReadFile();
             } else {
-                return;
+                onNoNetworkDialog("Connect to Network, Local Data Only");
             }
         }
 
@@ -210,5 +217,26 @@ public class MainActivity extends Activity {
             CustomList adapter = new CustomList(this, strings, values, myList);
             listView.setAdapter(adapter);
         }
+    }
+
+    /**
+     * Network dialog to inform the users.
+     */
+    public void onNoNetworkDialog(String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(message)
+                .setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Log.d(TAG, "Accepted");
+                    }
+                })
+                .setNegativeButton(R.string.decline, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Log.d(TAG, "Continued");
+                    }
+                });
+        // Create the AlertDialog object and return it
+        AlertDialog alertBuilder =  builder.create();
+        alertBuilder.show();
     }
 }
