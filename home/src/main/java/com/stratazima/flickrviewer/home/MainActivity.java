@@ -62,31 +62,21 @@ public class MainActivity extends Activity {
             @Override
             public void handleMessage(Message msg) {
                 if (msg.arg1 == RESULT_OK && msg.obj != null) {
-                    mContext = getApplicationContext();
-                    jsonStorage = DataStorage.getInstance(mContext);
                     String temp = (String) msg.obj;
-                    if (jsonStorage.onWriteFile(temp)) {
-                        Toast toast = Toast.makeText(getApplicationContext(), "Loaded", Toast.LENGTH_SHORT);
-                        toast.show();
-                    }
+                    jsonStorage.onWriteFile(temp);
                     setProgressBar(false);
                     onListCreate();
                 }}
         };
 
         onListCreate();
-
-        if (isNetworkOnline()){
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    onRefresh();
-                }
-            }, 2000);
-        } else {
-            onNoNetworkDialog("Need Network to Continue");
-        }
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                onRefresh();
+            }
+        }, 2000);
     }
 
     /**
@@ -96,11 +86,19 @@ public class MainActivity extends Activity {
      */
 
     private void onRefresh(){
-        setProgressBar(true);
-        Messenger refreshMessenger = new Messenger(mHandle);
-        Intent networkIntent = new Intent(this, NetworkServices.class);
-        networkIntent.putExtra(MESSAGE, refreshMessenger);
-        startService(networkIntent);
+        if (isNetworkOnline()) {
+            setProgressBar(true);
+
+            mContext = getApplicationContext();
+            jsonStorage = DataStorage.getInstance(mContext);
+
+            Messenger refreshMessenger = new Messenger(mHandle);
+            Intent networkIntent = new Intent(this, NetworkServices.class);
+            networkIntent.putExtra(MESSAGE, refreshMessenger);
+            startService(networkIntent);
+        } else {
+            onNoNetworkDialog("Need Network to Load");
+        }
     }
 
     /**
@@ -173,12 +171,12 @@ public class MainActivity extends Activity {
                 daJSONArray = jsonStorage.onReadFile();
             }
         } else {
-            Toast toast = Toast.makeText(getApplicationContext(), "Please Connect to Network", Toast.LENGTH_SHORT);
-            toast.show();
             if (jsonStorage.onCheckFile()) {
                 daJSONArray = jsonStorage.onReadFile();
+                onNoNetworkDialog("Local Data Only");
             } else {
-                onNoNetworkDialog("Connect to Network, Local Data Only");
+                onNoNetworkDialog("Connect to Network");
+                return;
             }
         }
 
@@ -213,8 +211,8 @@ public class MainActivity extends Activity {
             }
 
             String[] strings = new String[myList.size()];
-            String[] values = {"username", "title","imageURL"};
-            CustomList adapter = new CustomList(this, strings, values, myList);
+            boolean isConnected = isNetworkOnline();
+            CustomList adapter = new CustomList(this, strings, isConnected, myList);
             listView.setAdapter(adapter);
         }
     }

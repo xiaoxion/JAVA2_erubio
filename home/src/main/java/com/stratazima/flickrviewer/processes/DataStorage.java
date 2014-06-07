@@ -42,20 +42,16 @@ public final class DataStorage implements Cloneable {
     }
 
 
-    public boolean onWriteFile(String jsonObject) {
-        boolean results = false;
+    public void onWriteFile(String jsonObject) {
         try {
             FileOutputStream fos = mContext.openFileOutput("flickr.txt", Context.MODE_PRIVATE);
             fos.write(jsonObject.getBytes());
             fos.close();
-            results = true;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return results;
     }
 
     public JSONArray onReadFile() {

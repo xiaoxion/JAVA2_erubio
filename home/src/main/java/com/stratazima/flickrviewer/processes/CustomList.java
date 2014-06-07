@@ -22,14 +22,14 @@ import java.util.HashMap;
 
 public class CustomList extends ArrayAdapter<String> {
     private final Activity context;
-    private final String[] values;
+    private final boolean isConnected;
     private final ArrayList<HashMap<String, String>> daArrayList;
 
-    public CustomList(Activity context, String[] length, String[] values, ArrayList<HashMap<String, String>> daArrayList) {
+    public CustomList(Activity context, String[] length, boolean isConnected, ArrayList<HashMap<String, String>> daArrayList) {
         super(context, R.layout.custom_listview, length);
 
         this.context = context;
-        this.values = values;
+        this.isConnected = isConnected;
         this.daArrayList = daArrayList;
     }
 
@@ -44,9 +44,11 @@ public class CustomList extends ArrayAdapter<String> {
         TextView subTitle = (TextView) rowView.findViewById(R.id.sub_row);
         ImageView imageView = (ImageView) rowView.findViewById(R.id.flickr_image);
 
-        mainTitle.setText(daArrayList.get(position).get(values[0]));
-        subTitle.setText(daArrayList.get(position).get(values[1]));
-        aq.id(imageView).image(daArrayList.get(position).get(values[2]));
+        mainTitle.setText(daArrayList.get(position).get("username"));
+        subTitle.setText(daArrayList.get(position).get("title"));
+        if (isConnected) {
+            aq.id(imageView).image(daArrayList.get(position).get("imageURL"));
+        }
         return rowView;
     }
 }
