@@ -154,6 +154,11 @@ public class MainActivity extends Activity {
         return status;
     }
 
+    /**
+     * Creates the list adapter and sends it to a
+     * custom list adapter that will allow for image loading.
+     */
+
     public void onListCreate() {
         mContext = getApplicationContext();
         jsonStorage = DataStorage.getInstance(mContext);
