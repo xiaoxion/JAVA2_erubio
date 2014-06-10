@@ -32,6 +32,10 @@ public final class DataStorage implements Cloneable {
         return mInstance;
     }
 
+    /**
+     * Check file so that the application can check if there
+     * is an existing file.
+     */
     public boolean onCheckFile() {
         Boolean fileExist = false;
 
@@ -41,7 +45,9 @@ public final class DataStorage implements Cloneable {
         return fileExist;
     }
 
-
+    /**
+     * Writes JSON data to application files directory.
+     */
     public void onWriteFile(String jsonObject) {
         try {
             FileOutputStream fos = mContext.openFileOutput("flickr.txt", Context.MODE_PRIVATE);
@@ -54,6 +60,9 @@ public final class DataStorage implements Cloneable {
         }
     }
 
+    /**
+     * Reads file and creates a JSONArray which is sent to the main activity
+     */
     public JSONArray onReadFile() {
         String content;
         try {

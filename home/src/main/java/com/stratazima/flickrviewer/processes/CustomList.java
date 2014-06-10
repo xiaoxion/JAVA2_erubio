@@ -26,7 +26,7 @@ public class CustomList extends ArrayAdapter<String> {
     private final ArrayList<HashMap<String, String>> daArrayList;
 
     public CustomList(Activity context, String[] length, boolean isConnected, ArrayList<HashMap<String, String>> daArrayList) {
-        super(context, R.layout.custom_listview, length);
+        super(context, R.layout.item_custom, length);
 
         this.context = context;
         this.isConnected = isConnected;
@@ -38,7 +38,7 @@ public class CustomList extends ArrayAdapter<String> {
         AQuery aq = new AQuery(context);
 
         LayoutInflater inflater = context.getLayoutInflater();
-        View rowView= inflater.inflate(R.layout.custom_listview, null, true);
+        View rowView= inflater.inflate(R.layout.item_custom, null, true);
 
         TextView mainTitle = (TextView) rowView.findViewById(R.id.main_row);
         TextView subTitle = (TextView) rowView.findViewById(R.id.sub_row);
@@ -51,4 +51,6 @@ public class CustomList extends ArrayAdapter<String> {
         }
         return rowView;
     }
+
+
 }

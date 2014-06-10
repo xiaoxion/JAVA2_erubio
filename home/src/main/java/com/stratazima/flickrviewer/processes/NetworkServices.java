@@ -155,8 +155,12 @@ public class NetworkServices extends IntentService {
                             is.close();
                             result = sb.toString();
                             JSONObject temporary = new JSONObject(result);
-                            temporary = (JSONObject) temporary.getJSONObject("sizes").getJSONArray("size").get(1);
-                            objects[i].put("imageURL", temporary.getString("source"));
+
+                            JSONObject temporary2 = (JSONObject) temporary.getJSONObject("sizes").getJSONArray("size").get(1);
+                            objects[i].put("imageURL", temporary2.getString("source"));
+
+                            temporary2 = (JSONObject) temporary.getJSONObject("sizes").getJSONArray("size").get(5);
+                            objects[i].put("largeURL", temporary2.getString("source"));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

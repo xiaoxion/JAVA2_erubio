@@ -14,7 +14,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -41,8 +40,9 @@ public class MainActivity extends Activity {
     private Handler mHandle;
     private Context mContext;
     DataStorage jsonStorage;
+    JSONArray daJSONArray;
     ListView listView;
-    String TAG = "Main";
+    final String TAG = "Main";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,14 +50,12 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         listView = (ListView) findViewById(R.id.listView);
-        View listHeader = this.getLayoutInflater().inflate(R.layout.header_listview, null);
+        View listHeader = this.getLayoutInflater().inflate(R.layout.item_header, null);
         listView.addHeaderView(listHeader);
 
         mHandle = new Handler() {
             /**
-             * Handler that saves/overwrites the file and makes a toast
-             * for debug reasons and give user feedback.
-             * Will remove later on.
+             * Handler that saves/overwrites the file.
              */
             @Override
             public void handleMessage(Message msg) {
@@ -70,6 +68,8 @@ public class MainActivity extends Activity {
         };
 
         onListCreate();
+
+        // Set delay for a new refresh.
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -162,7 +162,7 @@ public class MainActivity extends Activity {
     public void onListCreate() {
         mContext = getApplicationContext();
         jsonStorage = DataStorage.getInstance(mContext);
-        JSONArray daJSONArray = null;
+        daJSONArray = null;
         ArrayList<HashMap<String,String>> myList = new ArrayList<HashMap<String, String>>();
 
         /**
@@ -218,6 +218,29 @@ public class MainActivity extends Activity {
             String[] strings = new String[myList.size()];
             boolean isConnected = isNetworkOnline();
             CustomList adapter = new CustomList(this, strings, isConnected, myList);
+            listView.setOnItemClickListener(
+                    new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                            // TODO LIST
+                            Intent intent = new Intent(MainActivity.this, PhotoViewerActivity.class);
+
+                            JSONObject tempObject = null;
+                            try {
+                                tempObject = (JSONObject) daJSONArray.get(i-1);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            if (tempObject != null) {
+                                intent.putExtra("flickrObj", tempObject.toString());
+                            }
+
+                            startActivity(intent);
+                        }
+                    }
+            );
+
             listView.setAdapter(adapter);
         }
     }
