@@ -126,6 +126,9 @@ public class PhotoViewerActivity extends Activity {
         return super.onKeyDown(keyCode, event);
     }
 
+    /**
+     * Adds button view and sends implicit intent to action_view
+     */
     private void onFlickrButton(){
         Button button = (Button) findViewById(R.id.flickr_web);
         button.setOnClickListener(

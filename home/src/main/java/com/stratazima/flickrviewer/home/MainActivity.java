@@ -44,8 +44,6 @@ public class MainActivity extends Activity {
     JSONArray daJSONArray;
     ListView listView;
     final String TAG = "Main";
-    float mRating;
-    float mPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
