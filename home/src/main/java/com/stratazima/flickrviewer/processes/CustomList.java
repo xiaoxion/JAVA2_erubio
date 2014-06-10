@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import com.androidquery.AQuery;
 import com.stratazima.flickrviewer.home.R;
@@ -43,12 +44,14 @@ public class CustomList extends ArrayAdapter<String> {
         TextView mainTitle = (TextView) rowView.findViewById(R.id.main_row);
         TextView subTitle = (TextView) rowView.findViewById(R.id.sub_row);
         ImageView imageView = (ImageView) rowView.findViewById(R.id.flickr_image);
+        RatingBar ratingBar = (RatingBar) rowView.findViewById(R.id.main_rating);
 
         mainTitle.setText(daArrayList.get(position).get("username"));
         subTitle.setText(daArrayList.get(position).get("title"));
         if (isConnected) {
             aq.id(imageView).image(daArrayList.get(position).get("imageURL"));
         }
+        ratingBar.setRating(Float.parseFloat(daArrayList.get(position).get("rating")));
         return rowView;
     }
 

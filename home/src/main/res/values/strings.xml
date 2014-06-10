@@ -10,5 +10,6 @@
 
     <string name="accept">Accept</string>
     <string name="decline">Continue</string>
+    <string name="onWeb">View on Flickr</string>
 
 </resources>

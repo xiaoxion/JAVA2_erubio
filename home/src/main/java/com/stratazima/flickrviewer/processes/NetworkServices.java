@@ -159,11 +159,23 @@ public class NetworkServices extends IntentService {
                             JSONObject temporary2 = (JSONObject) temporary.getJSONObject("sizes").getJSONArray("size").get(1);
                             objects[i].put("imageURL", temporary2.getString("source"));
 
-                            temporary2 = (JSONObject) temporary.getJSONObject("sizes").getJSONArray("size").get(5);
+                            // Checks for the largest possible photo and assigns it to largeURL
+                            JSONArray temporary3 = temporary.getJSONObject("sizes").getJSONArray("size");
+
+                            int daInt = temporary3.length() - 1;
+                            if (daInt > 8) {
+                                temporary2 = (JSONObject) temporary3.get(8);
+                            } else {
+                                temporary2 = (JSONObject) temporary3.get(daInt);
+                            }
+
                             objects[i].put("largeURL", temporary2.getString("source"));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+
+                        objects[i].put("rating", 0);
+                        objects[i].put("id", temp.get("id"));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

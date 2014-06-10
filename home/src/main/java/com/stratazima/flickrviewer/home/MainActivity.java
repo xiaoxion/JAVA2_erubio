@@ -39,10 +39,13 @@ public class MainActivity extends Activity {
     private Menu refreshMenu;
     private Handler mHandle;
     private Context mContext;
+
     DataStorage jsonStorage;
     JSONArray daJSONArray;
     ListView listView;
     final String TAG = "Main";
+    float mRating;
+    float mPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,7 +162,7 @@ public class MainActivity extends Activity {
      * custom list adapter that will allow for image loading.
      */
 
-    public void onListCreate() {
+    private void onListCreate() {
         mContext = getApplicationContext();
         jsonStorage = DataStorage.getInstance(mContext);
         daJSONArray = null;
@@ -189,6 +192,7 @@ public class MainActivity extends Activity {
             String username = null;
             String title = null;
             String imageURL = null;
+            String daRating = null;
 
             for (int i = 0; i < daJSONArray.length(); i++) {
                 JSONObject tempObj = null;
@@ -203,6 +207,7 @@ public class MainActivity extends Activity {
                         username = tempObj.getString("username");
                         title = tempObj.getString("title");
                         imageURL = tempObj.getString("imageURL");
+                        daRating = tempObj.getString("rating");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -211,6 +216,7 @@ public class MainActivity extends Activity {
                 displayMap.put("username", username);
                 displayMap.put("title", title);
                 displayMap.put("imageURL", imageURL);
+                displayMap.put("rating", daRating);
 
                 myList.add(displayMap);
             }
@@ -222,7 +228,6 @@ public class MainActivity extends Activity {
                     new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                            // TODO LIST
                             Intent intent = new Intent(MainActivity.this, PhotoViewerActivity.class);
 
                             JSONObject tempObject = null;
@@ -234,9 +239,9 @@ public class MainActivity extends Activity {
 
                             if (tempObject != null) {
                                 intent.putExtra("flickrObj", tempObject.toString());
+                                intent.putExtra("position", Integer.toString(i-1));
                             }
-
-                            startActivity(intent);
+                            startActivityForResult(intent, 1);
                         }
                     }
             );
@@ -248,7 +253,7 @@ public class MainActivity extends Activity {
     /**
      * Network dialog to inform the users.
      */
-    public void onNoNetworkDialog(String message) {
+    private void onNoNetworkDialog(String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(message)
                 .setPositiveButton(R.string.accept, new DialogInterface.OnClickListener() {
@@ -264,5 +269,25 @@ public class MainActivity extends Activity {
         // Create the AlertDialog object and return it
         AlertDialog alertBuilder =  builder.create();
         alertBuilder.show();
+    }
+
+    /**
+     * Receives data, writes to disk, and recreates list with update
+     */
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                try {
+                    daJSONArray.getJSONObject(Integer.parseInt(data.getStringExtra("position"))).put("rating", data.getStringExtra("rateResult"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                jsonStorage.onWriteFile(daJSONArray.toString());
+                onListCreate();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }
