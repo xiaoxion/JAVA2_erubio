@@ -55,11 +55,15 @@ public class PhotoViewerActivity extends Activity {
         }
 
         String username = null;
+        String realname = null;
+        String location = null;
         String title = null;
         String largeURL = null;
 
         try {
             username = flickrObj.getString("username");
+            realname = flickrObj.getString("realname");
+            location = flickrObj.getString("location");
             title    = flickrObj.getString("title");
             largeURL = flickrObj.getString("largeURL");
             mRating  = flickrObj.getInt("rating");
@@ -71,10 +75,14 @@ public class PhotoViewerActivity extends Activity {
         AQuery aq = new AQuery(this);
 
         TextView usernameView = (TextView) findViewById(R.id.intent_username);
+        TextView realnameView = (TextView) findViewById(R.id.intent_realname);
+        TextView locationView = (TextView) findViewById(R.id.intent_location);
         ImageView largeURLView = (ImageView) findViewById(R.id.large_image);
         TextView titleView = (TextView) findViewById(R.id.intent_title);
 
         usernameView.setText(username);
+        realnameView.setText(realname);
+        locationView.setText(location);
         aq.id(largeURLView).image(largeURL);
         titleView.setText(title);
     }
