@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <!-- From: file:/E:/Dropbox/School/15-JAVA2/Rebased/home/src/main/res/values-sw600dp/refs.xml -->
-    <eat-comment />
-
-    <item name="activity_flickrphoto_list" type="layout">@layout/activity_flickrphoto_twopane</item>
-
-</resources>
