@@ -1,0 +1,17 @@
+<!-- From: file:/E:/Dropbox/School/15-JAVA2/Rebased/home/src/main/AndroidManifest.xml --><manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="com.stratazima.flickrviewer.home">
+    <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="19"/>
+
+    <application android:allowBackup="true" android:icon="@drawable/ic_launcher" android:label="@string/app_name" android:theme="@style/AppTheme">
+        <activity android:label="@string/app_name" android:name="com.stratazima.flickrviewer.home.FlickrPhotoListActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity android:label="@string/title_flickrphoto_detail" android:name="com.stratazima.flickrviewer.home.FlickrPhotoDetailActivity" android:parentActivityName="com.stratazima.flickrviewer.home.FlickrPhotoListActivity">
+            <meta-data android:name="android.support.PARENT_ACTIVITY" android:value="com.stratazima.flickrviewer.home.FlickrPhotoListActivity"/>
+        </activity>
+    </application>
+
+</manifest>
