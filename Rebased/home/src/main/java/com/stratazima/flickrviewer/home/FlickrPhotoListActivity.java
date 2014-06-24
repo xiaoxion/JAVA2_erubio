@@ -28,6 +28,7 @@ public class FlickrPhotoListActivity extends Activity implements FlickrPhotoList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_flickrphoto_list);
 
+        // Handler to handle the incoming data from service
         mHandle = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -40,15 +41,9 @@ public class FlickrPhotoListActivity extends Activity implements FlickrPhotoList
                 }}
         };
 
+        // Handles weather or not there is two sections
         if (findViewById(R.id.flickrphoto_detail_container) != null) {
-            // The detail container view will be present only in the
-            // large-screen layouts (res/values-large and
-            // res/values-sw600dp). If this view is present, then the
-            // activity should be in two-pane mode.
             mTwoPane = true;
-
-            // In two-pane mode, list items should be given the
-            // 'activated' state when touched.
             ((FlickrPhotoListFragment) getFragmentManager()
                     .findFragmentById(R.id.flickrphoto_list))
                     .setActivateOnItemClick(true);
@@ -57,12 +52,10 @@ public class FlickrPhotoListActivity extends Activity implements FlickrPhotoList
         // TODO: If exposing deep links into your app, handle intents here.
     }
 
+    // Selects what should be opened, a fragment or an activity
     @Override
     public void onItemSelected(String id) {
         if (mTwoPane && !id.equals("")) {
-            // In two-pane mode, show the detail view in this activity by
-            // adding or replacing the detail fragment using a
-            // fragment transaction.
             Bundle arguments = new Bundle();
             arguments.putString(FlickrPhotoDetailFragment.ARG_ITEM_ID, id);
             FlickrPhotoDetailFragment fragment = new FlickrPhotoDetailFragment();
@@ -80,6 +73,7 @@ public class FlickrPhotoListActivity extends Activity implements FlickrPhotoList
         }
     }
 
+    // Refresh menu creation a handling.
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         refreshMenu = menu;
@@ -96,6 +90,7 @@ public class FlickrPhotoListActivity extends Activity implements FlickrPhotoList
         return true;
     }
 
+    // Checks if there is a valid network.
     public boolean isNetworkOnline() {
         boolean status = false;
 
@@ -110,6 +105,7 @@ public class FlickrPhotoListActivity extends Activity implements FlickrPhotoList
         return status;
     }
 
+    // Sets the Progress bar while the data is loading.
     public void setProgressBar (final boolean refreshing) {
         if (refreshMenu != null) {
             final MenuItem refreshedItem = refreshMenu.findItem(R.id.action_refresh);
@@ -123,6 +119,7 @@ public class FlickrPhotoListActivity extends Activity implements FlickrPhotoList
         }
     }
 
+    // Refreshed the file and updates is with the handler.
     public void onRefresh(){
         if (isNetworkOnline()) {
             setProgressBar(true);

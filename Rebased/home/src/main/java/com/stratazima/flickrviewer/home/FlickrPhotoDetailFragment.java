@@ -26,6 +26,7 @@ public class FlickrPhotoDetailFragment extends Fragment {
     public FlickrPhotoDetailFragment() {
     }
 
+    // Populates the flickrObj with the incoming JSON data
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +38,7 @@ public class FlickrPhotoDetailFragment extends Fragment {
         }
     }
 
+    // Sets the UI and creates it
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_flickrphoto_detail, container, false);
@@ -47,6 +49,7 @@ public class FlickrPhotoDetailFragment extends Fragment {
         return rootView;
     }
 
+    // Sets the UI data
     private void onSetData(View view) {
         String username = null;
         String realname = null;
@@ -81,6 +84,7 @@ public class FlickrPhotoDetailFragment extends Fragment {
         titleView.setText(title);
     }
 
+    // Sets the rating bar so we can capture the data
     private void onSetRatingBar(View view) {
         RatingBar ratingBar = (RatingBar) view.findViewById(R.id.rating_bar);
         ratingBar.setRating(mRating);
@@ -94,6 +98,8 @@ public class FlickrPhotoDetailFragment extends Fragment {
         );
     }
 
+    // Sets the Flickr Button so the user can check photo
+    // on the web
     private void onFlickrButton(View view){
         Button button = (Button) view.findViewById(R.id.flickr_web);
         button.setOnClickListener(

@@ -55,6 +55,7 @@ public class FlickrPhotoListFragment extends ListFragment {
         }
     }
 
+    // Adds header and instantiates listview
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -63,6 +64,7 @@ public class FlickrPhotoListFragment extends ListFragment {
         onListCreate();
     }
 
+    // Sets the callback
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -73,12 +75,14 @@ public class FlickrPhotoListFragment extends ListFragment {
         mCallbacks = (Callbacks) activity;
     }
 
+    // Returns the callback
     @Override
     public void onDetach() {
         super.onDetach();
         mCallbacks = sDummyCallbacks;
     }
 
+    // Sets the listitem data and sends it to the main activity
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
@@ -89,6 +93,7 @@ public class FlickrPhotoListFragment extends ListFragment {
         }
     }
 
+    // Saves data when rotating
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -98,6 +103,7 @@ public class FlickrPhotoListFragment extends ListFragment {
         }
     }
 
+    // Activate on click when in landscape
     public void setActivateOnItemClick(boolean activateOnItemClick) {
         // When setting CHOICE_MODE_SINGLE, ListView will automatically
         // give items the 'activated' state when touched.
@@ -106,6 +112,7 @@ public class FlickrPhotoListFragment extends ListFragment {
                 : ListView.CHOICE_MODE_NONE);
     }
 
+    // Sets the active position and maintains active position while active.
     private void setActivatedPosition(int position) {
         if (position == ListView.INVALID_POSITION) {
             getListView().setItemChecked(mActivatedPosition, false);
@@ -116,6 +123,7 @@ public class FlickrPhotoListFragment extends ListFragment {
         mActivatedPosition = position;
     }
 
+    // Checks if there is a valid network connection
     public boolean isNetworkOnline() {
         boolean status = false;
 
@@ -132,6 +140,7 @@ public class FlickrPhotoListFragment extends ListFragment {
         return status;
     }
 
+    // Creates listview adapter and recreates list
     public void onListCreate() {
         Context mContext = getActivity().getApplicationContext();
         jsonStorage = DataStorage.getInstance(mContext);
@@ -199,6 +208,8 @@ public class FlickrPhotoListFragment extends ListFragment {
         }
     }
 
+    // If there is not network, creates a popup letting the
+    // user know we need a network
     private void onNoNetworkDialog(String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(message)
@@ -214,6 +225,4 @@ public class FlickrPhotoListFragment extends ListFragment {
         AlertDialog alertBuilder =  builder.create();
         alertBuilder.show();
     }
-
-
 }

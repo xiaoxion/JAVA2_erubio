@@ -8,6 +8,7 @@ import android.view.MenuItem;
 
 public class FlickrPhotoDetailActivity extends Activity {
 
+    // Implements the fragment and passes information
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +28,7 @@ public class FlickrPhotoDetailActivity extends Activity {
         }
     }
 
+    // Sets back on action bar selected
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
