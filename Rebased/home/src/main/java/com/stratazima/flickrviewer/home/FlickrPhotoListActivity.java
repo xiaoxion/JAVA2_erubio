@@ -1,9 +1,6 @@
 package com.stratazima.flickrviewer.home;
 
-import android.app.AlertDialog;
-import android.app.FragmentManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -12,34 +9,13 @@ import android.app.Activity;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
-import android.provider.ContactsContract;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
-import com.stratazima.flickrviewer.home.R;
 import com.stratazima.flickrviewer.processes.DataStorage;
 import com.stratazima.flickrviewer.processes.NetworkServices;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-
-/**
- * An activity representing a list of FlickrPhotos. This activity
- * has different presentations for handset and tablet-size devices. On
- * handsets, the activity presents a list of items, which when touched,
- * lead to a {@link FlickrPhotoDetailActivity} representing
- * item details. On tablets, the activity presents the list of items and
- * item details side-by-side using two vertical panes.
- * <p>
- * The activity makes heavy use of fragments. The list of items is a
- * {@link FlickrPhotoListFragment} and the item details
- * (if present) is a {@link FlickrPhotoDetailFragment}.
- * <p>
- * This activity also implements the required
- * {@link FlickrPhotoListFragment.Callbacks} interface
- * to listen for item selections.
- */
 public class FlickrPhotoListActivity extends Activity implements FlickrPhotoListFragment.Callbacks {
     public static final String MESSAGE = "messenger";
     private Menu refreshMenu;

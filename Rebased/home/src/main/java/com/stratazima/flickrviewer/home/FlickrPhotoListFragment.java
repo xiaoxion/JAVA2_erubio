@@ -20,7 +20,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
 public class FlickrPhotoListFragment extends ListFragment {
 
     private static final String STATE_ACTIVATED_POSITION = "activated_position";

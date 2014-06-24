@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,15 +14,12 @@ import android.widget.TextView;
 
 
 import com.androidquery.AQuery;
-import com.stratazima.flickrviewer.home.R;
-import com.stratazima.flickrviewer.home.dummy.DummyContent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class FlickrPhotoDetailFragment extends Fragment {
     public static final String ARG_ITEM_ID = "item_id";
     float mRating;
-    int mPosition;
     String id = null;
     private JSONObject flickrObj;
 
@@ -39,6 +35,16 @@ public class FlickrPhotoDetailFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_flickrphoto_detail, container, false);
+        onSetData(rootView);
+        onSetRatingBar(rootView);
+        onFlickrButton(rootView);
+
+        return rootView;
     }
 
     private void onSetData(View view) {
@@ -75,20 +81,6 @@ public class FlickrPhotoDetailFragment extends Fragment {
         titleView.setText(title);
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_flickrphoto_detail, container, false);
-        onSetData(rootView);
-        onSetRatingBar(rootView);
-        onFlickrButton(rootView);
-
-        return rootView;
-    }
-
-    /**
-     * Saves rating bar data and sets it.
-     */
     private void onSetRatingBar(View view) {
         RatingBar ratingBar = (RatingBar) view.findViewById(R.id.rating_bar);
         ratingBar.setRating(mRating);
@@ -102,23 +94,6 @@ public class FlickrPhotoDetailFragment extends Fragment {
         );
     }
 
-//    /**
-//     * Returns data to main activity
-//     */
-//    @Override
-//    public boolean onKeyDown(int keyCode, KeyEvent event) {
-//        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-//            Intent returnIntent = new Intent();
-//            returnIntent.putExtra("rateResult", Float.toString(mRating));
-//            returnIntent.putExtra("position", Integer.toString(mPosition));
-//            setResult(RESULT_OK, returnIntent);
-//        }
-//        return super.onKeyDown(keyCode, event);
-//    }
-
-    /**
-     * Adds button view and sends implicit intent to action_view
-     */
     private void onFlickrButton(View view){
         Button button = (Button) view.findViewById(R.id.flickr_web);
         button.setOnClickListener(
