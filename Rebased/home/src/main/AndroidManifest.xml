@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.stratazima.flickrviewer.home" >
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -24,6 +27,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.stratazima.flickrviewer.home.FlickrPhotoListActivity" />
         </activity>
+        <service android:name="com.stratazima.flickrviewer.processes.NetworkServices"/>
     </application>
 
 </manifest>

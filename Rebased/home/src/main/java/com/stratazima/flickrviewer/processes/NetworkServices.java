@@ -177,6 +177,7 @@ public class NetworkServices extends IntentService {
 
                         objects[i].put("rating", 0);
                         objects[i].put("id", temp.get("id"));
+                        objects[i].put("position", i);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

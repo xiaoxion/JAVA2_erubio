@@ -8,13 +8,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.app.ListFragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
+import android.view.*;
 import android.widget.ListView;
 
-import com.stratazima.flickrviewer.home.dummy.DummyContent;
 import com.stratazima.flickrviewer.processes.CustomList;
 import com.stratazima.flickrviewer.processes.DataStorage;
 import org.json.JSONArray;
@@ -26,87 +22,34 @@ import java.util.HashMap;
 
 
 public class FlickrPhotoListFragment extends ListFragment {
-    private Context mContext;
+
+    private static final String STATE_ACTIVATED_POSITION = "activated_position";
+    private Callbacks mCallbacks = sDummyCallbacks;
+    private int mActivatedPosition = ListView.INVALID_POSITION;
 
     DataStorage jsonStorage;
     JSONArray daJSONArray;
-    ListView listView;
 
-    /**
-     * The serialization (saved instance state) Bundle key representing the
-     * activated item position. Only used on tablets.
-     */
-    private static final String STATE_ACTIVATED_POSITION = "activated_position";
-
-    /**
-     * The fragment's current callback object, which is notified of list item
-     * clicks.
-     */
-    private Callbacks mCallbacks = sDummyCallbacks;
-
-    /**
-     * The current activated item position. Only used on tablets.
-     */
-    private int mActivatedPosition = ListView.INVALID_POSITION;
-
-    /**
-     * A callback interface that all activities containing this fragment must
-     * implement. This mechanism allows activities to be notified of item
-     * selections.
-     */
     public interface Callbacks {
-        /**
-         * Callback for when an item has been selected.
-         */
         public void onItemSelected(String id);
     }
-
-    /**
-     * A dummy implementation of the {@link Callbacks} interface that does
-     * nothing. Used only when this fragment is not attached to an activity.
-     */
     private static Callbacks sDummyCallbacks = new Callbacks() {
         @Override
         public void onItemSelected(String id) {
         }
     };
-
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
     public FlickrPhotoListFragment() {
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // TODO: replace with a real list adapter.
-        setListAdapter(new ArrayAdapter<DummyContent.DummyItem>(
-                getActivity(),
-                android.R.layout.simple_list_item_activated_1,
-                android.R.id.text1,
-                DummyContent.ITEMS));
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_flickrphoto_list, container, false);
-        listView = (ListView) view.findViewById(R.id.flickrphoto_list);
-        View header = inflater.inflate(R.layout.item_header, null);
-
-        listView.addHeaderView(header);
-        onListCreate();
-
-        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Restore the previously serialized activated item position.
         if (savedInstanceState != null
                 && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
             setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
@@ -114,32 +57,37 @@ public class FlickrPhotoListFragment extends ListFragment {
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        View view = getActivity().getLayoutInflater().inflate(R.layout.item_header, null);
+        this.getListView().addHeaderView(view);
+        onListCreate();
+    }
+
+    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
-        // Activities containing this fragment must implement its callbacks.
         if (!(activity instanceof Callbacks)) {
             throw new IllegalStateException("Activity must implement fragment's callbacks.");
         }
-
         mCallbacks = (Callbacks) activity;
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-
-        // Reset the active callbacks interface to the dummy implementation.
         mCallbacks = sDummyCallbacks;
     }
 
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
-
-        // Notify the active callbacks interface (the activity, if the
-        // fragment is attached to one) that an item has been selected.
-        mCallbacks.onItemSelected(DummyContent.ITEMS.get(position).id);
+        try {
+            mCallbacks.onItemSelected(daJSONArray.getJSONObject(position-1).toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -151,10 +99,6 @@ public class FlickrPhotoListFragment extends ListFragment {
         }
     }
 
-    /**
-     * Turns on activate-on-click mode. When this mode is on, list items will be
-     * given the 'activated' state when touched.
-     */
     public void setActivateOnItemClick(boolean activateOnItemClick) {
         // When setting CHOICE_MODE_SINGLE, ListView will automatically
         // give items the 'activated' state when touched.
@@ -173,25 +117,24 @@ public class FlickrPhotoListFragment extends ListFragment {
         mActivatedPosition = position;
     }
 
-    /**
-     * Checks if network is online
-     */
-
     public boolean isNetworkOnline() {
         boolean status = false;
-        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        if (netInfo != null) {
-            if (netInfo.isConnected()) {
-                status= true;
+
+        if (getActivity() != null) {
+            ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo netInfo = cm.getActiveNetworkInfo();
+            if (netInfo != null) {
+                if (netInfo.isConnected()) {
+                    status= true;
+                }
             }
         }
 
         return status;
     }
 
-    private void onListCreate() {
-        mContext = getActivity().getApplicationContext();
+    public void onListCreate() {
+        Context mContext = getActivity().getApplicationContext();
         jsonStorage = DataStorage.getInstance(mContext);
         daJSONArray = null;
         ArrayList<HashMap<String,String>> myList = new ArrayList<HashMap<String, String>>();
@@ -253,12 +196,10 @@ public class FlickrPhotoListFragment extends ListFragment {
             boolean isConnected = isNetworkOnline();
             CustomList adapter = new CustomList(getActivity(), strings, isConnected, myList);
 
-            listView.setAdapter(adapter);
+            setListAdapter(adapter);
         }
     }
-    /**
-     * Network dialog to inform the users.
-     */
+
     private void onNoNetworkDialog(String message) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(message)
@@ -274,4 +215,6 @@ public class FlickrPhotoListFragment extends ListFragment {
         AlertDialog alertBuilder =  builder.create();
         alertBuilder.show();
     }
+
+
 }
