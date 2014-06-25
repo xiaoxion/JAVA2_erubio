@@ -1,10 +1,12 @@
 package com.stratazima.flickrviewer.home;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.app.Activity;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
+import org.json.JSONObject;
 
 public class FlickrPhotoDetailActivity extends Activity {
 
@@ -23,7 +25,8 @@ public class FlickrPhotoDetailActivity extends Activity {
             FlickrPhotoDetailFragment fragment = new FlickrPhotoDetailFragment();
             fragment.setArguments(arguments);
             getFragmentManager().beginTransaction()
-                    .add(R.id.flickrphoto_detail_container, fragment)
+                    .add(R.id.flickrphoto_detail_container, fragment, "photo_detail")
+                    .addToBackStack("detail")
                     .commit();
         }
     }

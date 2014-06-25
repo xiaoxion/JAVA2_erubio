@@ -1,6 +1,8 @@
 package com.stratazima.flickrviewer.home;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -47,6 +49,11 @@ public class FlickrPhotoDetailFragment extends Fragment {
         onFlickrButton(rootView);
 
         return rootView;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
     }
 
     // Sets the UI data
@@ -109,10 +116,23 @@ public class FlickrPhotoDetailFragment extends Fragment {
                         String url = "http://flickr.com/photo.gne?id=" + id;
                         Intent intent = new Intent(Intent.ACTION_VIEW);
                         intent.setData(Uri.parse(url));
-
                         startActivity(intent);
                     }
                 }
         );
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (!FlickrPhotoListActivity.mTwoPane) {
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("intentResult", flickrObj.toString());
+            getFragmentManager().popBackStack();
+            getActivity().setResult(Activity.RESULT_OK, returnIntent);
+            getActivity().finish();
+        } else {
+            getFragmentManager().popBackStack();
+        }
     }
 }

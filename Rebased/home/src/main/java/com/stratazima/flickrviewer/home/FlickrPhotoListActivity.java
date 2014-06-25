@@ -1,7 +1,10 @@
 package com.stratazima.flickrviewer.home;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -15,11 +18,13 @@ import android.view.MenuItem;
 import android.widget.Toast;
 import com.stratazima.flickrviewer.processes.DataStorage;
 import com.stratazima.flickrviewer.processes.NetworkServices;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class FlickrPhotoListActivity extends Activity implements FlickrPhotoListFragment.Callbacks {
     public static final String MESSAGE = "messenger";
     private Menu refreshMenu;
-    private boolean mTwoPane;
+    public static boolean mTwoPane = false;
     DataStorage jsonStorage;
     private Handler mHandle;
 
@@ -55,16 +60,18 @@ public class FlickrPhotoListActivity extends Activity implements FlickrPhotoList
     // Selects what should be opened, a fragment or an activity
     @Override
     public void onItemSelected(String id) {
-        if (mTwoPane && !id.equals("")) {
+        if (findViewById(R.id.flickrphoto_detail_container) != null && !id.equals("")) {
             Bundle arguments = new Bundle();
             arguments.putString(FlickrPhotoDetailFragment.ARG_ITEM_ID, id);
             FlickrPhotoDetailFragment fragment = new FlickrPhotoDetailFragment();
             fragment.setArguments(arguments);
             getFragmentManager().beginTransaction()
                     .replace(R.id.flickrphoto_detail_container, fragment)
+                    .addToBackStack("detail")
                     .commit();
 
         } else if (!id.equals("")){
+            mTwoPane = false;
             Intent intent = new Intent(FlickrPhotoListActivity.this, FlickrPhotoDetailActivity.class);
             intent.putExtra(FlickrPhotoDetailFragment.ARG_ITEM_ID, id);
             startActivityForResult(intent, 1);
@@ -133,6 +140,26 @@ public class FlickrPhotoListActivity extends Activity implements FlickrPhotoList
             startService(networkIntent);
         } else {
             Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                if (findViewById(R.id.flickrphoto_detail_container) != null) {
+                    mTwoPane = true;
+                    Bundle arguments = new Bundle();
+                    arguments.putString(FlickrPhotoDetailFragment.ARG_ITEM_ID, data.getStringExtra("intentResult"));
+                    FlickrPhotoDetailFragment fragment = new FlickrPhotoDetailFragment();
+                    fragment.setArguments(arguments);
+                    getFragmentManager().beginTransaction()
+                            .add(R.id.flickrphoto_detail_container, fragment, "photo_detail")
+                            .addToBackStack("detail")
+                            .commit();
+                }
+            }
         }
     }
 }
