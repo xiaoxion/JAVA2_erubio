@@ -1,10 +1,7 @@
 package com.stratazima.flickrviewer.home;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -18,8 +15,6 @@ import android.view.MenuItem;
 import android.widget.Toast;
 import com.stratazima.flickrviewer.processes.DataStorage;
 import com.stratazima.flickrviewer.processes.NetworkServices;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class FlickrPhotoListActivity extends Activity implements FlickrPhotoListFragment.Callbacks {
     public static final String MESSAGE = "messenger";
@@ -97,6 +92,27 @@ public class FlickrPhotoListActivity extends Activity implements FlickrPhotoList
         return true;
     }
 
+    // Recieve data from activity.
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                if (findViewById(R.id.flickrphoto_detail_container) != null) {
+                    mTwoPane = true;
+                    Bundle arguments = new Bundle();
+                    arguments.putString(FlickrPhotoDetailFragment.ARG_ITEM_ID, data.getStringExtra("intentResult"));
+                    FlickrPhotoDetailFragment fragment = new FlickrPhotoDetailFragment();
+                    fragment.setArguments(arguments);
+                    getFragmentManager().beginTransaction()
+                            .add(R.id.flickrphoto_detail_container, fragment, "photo_detail")
+                            .addToBackStack("detail")
+                            .commit();
+                }
+            }
+        }
+    }
+
     // Checks if there is a valid network.
     public boolean isNetworkOnline() {
         boolean status = false;
@@ -140,26 +156,6 @@ public class FlickrPhotoListActivity extends Activity implements FlickrPhotoList
             startService(networkIntent);
         } else {
             Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1) {
-            if (resultCode == RESULT_OK) {
-                if (findViewById(R.id.flickrphoto_detail_container) != null) {
-                    mTwoPane = true;
-                    Bundle arguments = new Bundle();
-                    arguments.putString(FlickrPhotoDetailFragment.ARG_ITEM_ID, data.getStringExtra("intentResult"));
-                    FlickrPhotoDetailFragment fragment = new FlickrPhotoDetailFragment();
-                    fragment.setArguments(arguments);
-                    getFragmentManager().beginTransaction()
-                            .add(R.id.flickrphoto_detail_container, fragment, "photo_detail")
-                            .addToBackStack("detail")
-                            .commit();
-                }
-            }
         }
     }
 }

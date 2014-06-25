@@ -82,7 +82,7 @@ public class FlickrPhotoListFragment extends ListFragment {
         mCallbacks = sDummyCallbacks;
     }
 
-    // Sets the listitem data and sends it to the main activity
+    // Sets the list item data and sends it to the main activity
     @Override
     public void onListItemClick(ListView listView, View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);

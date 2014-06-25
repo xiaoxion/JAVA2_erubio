@@ -122,6 +122,7 @@ public class FlickrPhotoDetailFragment extends Fragment {
         );
     }
 
+    // Handles when going into landscape
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
