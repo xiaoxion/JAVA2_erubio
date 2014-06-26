@@ -13,7 +13,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
 import android.preference.PreferenceManager;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,8 +21,6 @@ import android.widget.Toast;
 import com.stratazima.flickrviewer.dialogs.LoginFragment;
 import com.stratazima.flickrviewer.processes.DataStorage;
 import com.stratazima.flickrviewer.processes.NetworkServices;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 public class FlickrPhotoListActivity extends Activity implements FlickrPhotoListFragment.Callbacks, SearchView.OnQueryTextListener {
     public static final String MESSAGE = "messenger";
