@@ -2,9 +2,9 @@
 <resources>
 
     <string name="app_name">FlickrViewer</string>
-    <string name="header_main">Recent Flickr Photos</string>
-    <string name="header_explain1">View the most recent photos that Flickr</string>
-    <string name="header_explain2">users have uploaded.</string>
+    <string name="header_main">Welcome,</string>
+    <string name="header_explain1">View the most recent uploads</string>
+    <string name="header_explain2">of Flickr users.</string>
     <string name="image_title">Flickr Image</string>
 
     <string name="accept">Accept</string>
@@ -16,4 +16,7 @@
     <string name="action_refresh">Refresh</string>
     <string name="action_shared_dialog">Login</string>
     <string name="action_favorite">Favorite</string>
+
+    <string name="username">Username:</string>
+    <string name="password">Password:</string>
 </resources>

@@ -1,7 +1,10 @@
 package com.stratazima.flickrviewer.home;
 
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -9,10 +12,12 @@ import android.app.Activity;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
+import com.stratazima.flickrviewer.dialogs.LoginFragment;
 import com.stratazima.flickrviewer.processes.DataStorage;
 import com.stratazima.flickrviewer.processes.NetworkServices;
 
@@ -96,7 +101,17 @@ public class FlickrPhotoListActivity extends Activity implements FlickrPhotoList
                 onRefresh();
                 return true;
             case R.id.action_shared_dialog:
-                miniint = 2;
+                SharedPreferences preference = PreferenceManager.getDefaultSharedPreferences(this);
+                SharedPreferences.Editor edit = preference.edit();
+                if (preference.getString("username", "").isEmpty()) {
+                    edit.putString("username", "guest");
+                    edit.putString("password", "guest");
+                    edit.apply();
+                }
+
+                DialogFragment dialogFragment = LoginFragment.newInstance(R.string.action_shared_dialog);
+                dialogFragment.show(getFragmentManager(), "dialog");
+
                 return true;
             case R.id.action_favorite:
                 miniint = 3;

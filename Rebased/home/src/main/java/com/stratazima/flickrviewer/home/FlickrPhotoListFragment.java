@@ -11,11 +11,13 @@ import android.app.ListFragment;
 import android.view.*;
 import android.widget.ListView;
 
+import android.widget.TextView;
 import com.stratazima.flickrviewer.processes.CustomList;
 import com.stratazima.flickrviewer.processes.DataStorage;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +27,7 @@ public class FlickrPhotoListFragment extends ListFragment {
     private static final String STATE_ACTIVATED_POSITION = "activated_position";
     private Callbacks mCallbacks = sDummyCallbacks;
     private int mActivatedPosition = ListView.INVALID_POSITION;
+    private TextView headerViewText;
 
     DataStorage jsonStorage;
     JSONArray daJSONArray;
@@ -60,6 +63,7 @@ public class FlickrPhotoListFragment extends ListFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         View view = getActivity().getLayoutInflater().inflate(R.layout.item_header, null);
+        headerViewText = (TextView) view.findViewById(R.id.welcome_View);
         this.getListView().addHeaderView(view);
         onListCreate();
     }
@@ -224,5 +228,10 @@ public class FlickrPhotoListFragment extends ListFragment {
         // Create the AlertDialog object and return it
         AlertDialog alertBuilder =  builder.create();
         alertBuilder.show();
+    }
+
+    // Handle login in
+    public void onLogin(String username) {
+        headerViewText.setText("Welcome " + username + ",");
     }
 }
