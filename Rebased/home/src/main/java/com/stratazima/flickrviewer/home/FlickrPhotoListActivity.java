@@ -84,12 +84,26 @@ public class FlickrPhotoListActivity extends Activity implements FlickrPhotoList
         return true;
     }
 
+    // Handles the action bar buttons
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_refresh) {
-            onRefresh();
+        int miniint;
+        switch (item.getItemId()) {
+            case R.id.action_search:
+                miniint = 1;
+                return true;
+            case R.id.action_refresh:
+                onRefresh();
+                return true;
+            case R.id.action_shared_dialog:
+                miniint = 2;
+                return true;
+            case R.id.action_favorite:
+                miniint = 3;
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return true;
     }
 
     // Recieve data from activity.
