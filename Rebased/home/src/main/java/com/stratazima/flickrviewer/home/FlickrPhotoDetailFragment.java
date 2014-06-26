@@ -16,14 +16,16 @@ import android.widget.TextView;
 
 
 import com.androidquery.AQuery;
+import com.stratazima.flickrviewer.processes.DataStorage;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class FlickrPhotoDetailFragment extends Fragment {
     public static final String ARG_ITEM_ID = "item_id";
+    private JSONObject flickrObj;
     float mRating;
     String id = null;
-    private JSONObject flickrObj;
 
     public FlickrPhotoDetailFragment() {
     }
@@ -54,6 +56,28 @@ public class FlickrPhotoDetailFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+    }
+
+    // Handles when going into landscape
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (!FlickrPhotoListActivity.mTwoPane) {
+            Intent returnIntent = new Intent();
+            returnIntent.putExtra("intentResult", flickrObj.toString());
+            getFragmentManager().popBackStack();
+            getActivity().setResult(Activity.RESULT_OK, returnIntent);
+            getActivity().finish();
+        } else {
+            getFragmentManager().popBackStack();
+        }
+    }
+
+    // Calls the on update JSON
+    @Override
+    public void onPause() {
+        super.onPause();
+        onUpdateJSON();
     }
 
     // Sets the UI data
@@ -100,6 +124,11 @@ public class FlickrPhotoDetailFragment extends Fragment {
                     @Override
                     public void onRatingChanged(RatingBar rateBar, float v, boolean b) {
                         mRating = rateBar.getRating();
+                        try {
+                            flickrObj.put("rating", mRating);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
         );
@@ -122,18 +151,19 @@ public class FlickrPhotoDetailFragment extends Fragment {
         );
     }
 
-    // Handles when going into landscape
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        if (!FlickrPhotoListActivity.mTwoPane) {
-            Intent returnIntent = new Intent();
-            returnIntent.putExtra("intentResult", flickrObj.toString());
-            getFragmentManager().popBackStack();
-            getActivity().setResult(Activity.RESULT_OK, returnIntent);
-            getActivity().finish();
-        } else {
-            getFragmentManager().popBackStack();
+    // Receives updated JSON object and writes it to the main file.
+    public void onUpdateJSON() {
+        DataStorage jsonStorage = DataStorage.getInstance(getActivity());
+        JSONArray daJSONArray = jsonStorage.onReadFile();
+
+        int tempInt;
+        try {
+            tempInt = flickrObj.getInt("position");
+            daJSONArray.put(tempInt, flickrObj);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+
+        jsonStorage.onWriteFile(daJSONArray.toString());
     }
 }

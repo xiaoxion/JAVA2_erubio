@@ -29,9 +29,9 @@ public class FlickrPhotoListFragment extends ListFragment {
     private TextView headerViewText;
     private TextView emptyheaderViewText;
     private String filteringText;
+    public JSONArray daJSONArray;
 
     DataStorage jsonStorage;
-    JSONArray daJSONArray;
 
     public interface Callbacks {
         public void onItemSelected(String id);
@@ -68,7 +68,7 @@ public class FlickrPhotoListFragment extends ListFragment {
         emptyheaderViewText = (TextView) view.findViewById(R.id.emptyView);
 
         this.getListView().addHeaderView(view);
-        onListCreate(false);
+        onListCreate(false, false);
     }
 
     // Sets the callback
@@ -148,7 +148,7 @@ public class FlickrPhotoListFragment extends ListFragment {
     }
 
     // Creates listview adapter and recreates list
-    public void onListCreate(boolean isFiltering) {
+    public void onListCreate(boolean isFiltering, boolean isFavorite) {
         Context mContext = getActivity().getApplicationContext();
         jsonStorage = DataStorage.getInstance(mContext);
         daJSONArray = null;
@@ -204,14 +204,17 @@ public class FlickrPhotoListFragment extends ListFragment {
                 displayMap.put("imageURL", imageURL);
                 displayMap.put("rating", daRating);
 
-                if (username != null) {
+                if (username != null || daRating != null) {
                     if (isFiltering && username.toLowerCase().contains(filteringText.toLowerCase())) {
                         myList.add(displayMap);
-                    } else if (!isFiltering) {
+                    } else if (!isFiltering && !isFavorite) {
                         myList.add(displayMap);
+                    } else if (isFavorite) {
+                        if (Integer.parseInt(daRating) > 0) {
+                            myList.add(displayMap);
+                        }
                     }
                 }
-
             }
 
             if (isFiltering && myList.size() < 1) {
@@ -258,7 +261,7 @@ public class FlickrPhotoListFragment extends ListFragment {
     // Searching the listview
     public void onSearching(String searching) {
         filteringText = searching;
-        onListCreate(true);
+        onListCreate(true, false);
     }
 
     // If the the search is cancelled will reset the view.

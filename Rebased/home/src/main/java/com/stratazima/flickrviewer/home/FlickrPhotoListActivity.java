@@ -22,13 +22,16 @@ import android.widget.Toast;
 import com.stratazima.flickrviewer.dialogs.LoginFragment;
 import com.stratazima.flickrviewer.processes.DataStorage;
 import com.stratazima.flickrviewer.processes.NetworkServices;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class FlickrPhotoListActivity extends Activity implements FlickrPhotoListFragment.Callbacks, SearchView.OnQueryTextListener {
     public static final String MESSAGE = "messenger";
     private Menu refreshMenu;
     public static boolean mTwoPane = false;
-    DataStorage jsonStorage;
     private Handler mHandle;
+    boolean isFavorite = false;
+    DataStorage jsonStorage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +47,7 @@ public class FlickrPhotoListActivity extends Activity implements FlickrPhotoList
                     jsonStorage.onWriteFile(temp);
                     setProgressBar(false);
                     FlickrPhotoListFragment flickrPhotoListFragment = (FlickrPhotoListFragment) getFragmentManager().findFragmentById(R.id.daListFrag);
-                    flickrPhotoListFragment.onListCreate(false);
+                    flickrPhotoListFragment.onListCreate(false, false);
                 }}
         };
 
@@ -129,7 +132,15 @@ public class FlickrPhotoListActivity extends Activity implements FlickrPhotoList
 
                 return true;
             case R.id.action_favorite:
-                int miniInt = 3;
+                FlickrPhotoListFragment flickrPhotoListFragment = (FlickrPhotoListFragment) getFragmentManager().findFragmentById(R.id.daListFrag);
+
+                if (isFavorite) {
+                    isFavorite = false;
+                    flickrPhotoListFragment.onListCreate(false, false);
+                } else {
+                    isFavorite = true;
+                    flickrPhotoListFragment.onListCreate(false, true);
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
