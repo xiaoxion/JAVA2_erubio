@@ -19,4 +19,5 @@
 
     <string name="username">Username:</string>
     <string name="password">Password:</string>
+    <string name="exampleUser">Johnny123</string>
 </resources>

@@ -17,7 +17,6 @@ import com.stratazima.flickrviewer.processes.DataStorage;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +27,8 @@ public class FlickrPhotoListFragment extends ListFragment {
     private Callbacks mCallbacks = sDummyCallbacks;
     private int mActivatedPosition = ListView.INVALID_POSITION;
     private TextView headerViewText;
+    private TextView emptyheaderViewText;
+    private String filteringText;
 
     DataStorage jsonStorage;
     JSONArray daJSONArray;
@@ -64,8 +65,10 @@ public class FlickrPhotoListFragment extends ListFragment {
         super.onActivityCreated(savedInstanceState);
         View view = getActivity().getLayoutInflater().inflate(R.layout.item_header, null);
         headerViewText = (TextView) view.findViewById(R.id.welcome_View);
+        emptyheaderViewText = (TextView) view.findViewById(R.id.emptyView);
+
         this.getListView().addHeaderView(view);
-        onListCreate();
+        onListCreate(false);
     }
 
     // Sets the callback
@@ -145,7 +148,7 @@ public class FlickrPhotoListFragment extends ListFragment {
     }
 
     // Creates listview adapter and recreates list
-    public void onListCreate() {
+    public void onListCreate(boolean isFiltering) {
         Context mContext = getActivity().getApplicationContext();
         jsonStorage = DataStorage.getInstance(mContext);
         daJSONArray = null;
@@ -201,14 +204,31 @@ public class FlickrPhotoListFragment extends ListFragment {
                 displayMap.put("imageURL", imageURL);
                 displayMap.put("rating", daRating);
 
-                myList.add(displayMap);
+                if (username != null) {
+                    if (isFiltering && username.toLowerCase().contains(filteringText.toLowerCase())) {
+                        myList.add(displayMap);
+                    } else if (!isFiltering) {
+                        myList.add(displayMap);
+                    }
+                }
+
             }
 
+            if (isFiltering && myList.size() < 1) {
+                emptyheaderViewText.setText("Nothing to Show!");
+            } else if (isFiltering && filteringText.equals("")) {
+                emptyheaderViewText.setText("Please Input Something");
+            } else {
+                emptyheaderViewText.setText("");
+            }
+
+            filteringText = "";
             String[] strings = new String[myList.size()];
             boolean isConnected = isNetworkOnline();
             CustomList adapter = new CustomList(getActivity(), strings, isConnected, myList);
 
             setListAdapter(adapter);
+            getListView().setTextFilterEnabled(true);
         }
     }
 
@@ -233,5 +253,16 @@ public class FlickrPhotoListFragment extends ListFragment {
     // Handle login in
     public void onLogin(String username) {
         headerViewText.setText("Welcome " + username + ",");
+    }
+
+    // Searching the listview
+    public void onSearching(String searching) {
+        filteringText = searching;
+        onListCreate(true);
+    }
+
+    // If the the search is cancelled will reset the view.
+    public void onSearchCancelled() {
+        emptyheaderViewText.setText("");
     }
 }

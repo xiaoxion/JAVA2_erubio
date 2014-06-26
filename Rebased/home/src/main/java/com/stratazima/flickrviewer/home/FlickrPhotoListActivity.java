@@ -1,7 +1,7 @@
 package com.stratazima.flickrviewer.home;
 
-import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,15 +13,17 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.SearchView;
 import android.widget.Toast;
 import com.stratazima.flickrviewer.dialogs.LoginFragment;
 import com.stratazima.flickrviewer.processes.DataStorage;
 import com.stratazima.flickrviewer.processes.NetworkServices;
 
-public class FlickrPhotoListActivity extends Activity implements FlickrPhotoListFragment.Callbacks {
+public class FlickrPhotoListActivity extends Activity implements FlickrPhotoListFragment.Callbacks, SearchView.OnQueryTextListener {
     public static final String MESSAGE = "messenger";
     private Menu refreshMenu;
     public static boolean mTwoPane = false;
@@ -42,7 +44,7 @@ public class FlickrPhotoListActivity extends Activity implements FlickrPhotoList
                     jsonStorage.onWriteFile(temp);
                     setProgressBar(false);
                     FlickrPhotoListFragment flickrPhotoListFragment = (FlickrPhotoListFragment) getFragmentManager().findFragmentById(R.id.daListFrag);
-                    flickrPhotoListFragment.onListCreate();
+                    flickrPhotoListFragment.onListCreate(false);
                 }}
         };
 
@@ -86,16 +88,29 @@ public class FlickrPhotoListActivity extends Activity implements FlickrPhotoList
         refreshMenu = menu;
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
+
+        SearchManager searchManager = (SearchManager) getSystemService( Context.SEARCH_SERVICE );
+
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setOnQueryTextListener(this);
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                FlickrPhotoListFragment flickrPhotoListFragment = (FlickrPhotoListFragment) getFragmentManager().findFragmentById(R.id.daListFrag);
+                flickrPhotoListFragment.onSearchCancelled();
+                return false;
+            }
+        });
+
         return true;
     }
 
     // Handles the action bar buttons
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int miniint;
         switch (item.getItemId()) {
             case R.id.action_search:
-                miniint = 1;
                 return true;
             case R.id.action_refresh:
                 onRefresh();
@@ -114,14 +129,14 @@ public class FlickrPhotoListActivity extends Activity implements FlickrPhotoList
 
                 return true;
             case R.id.action_favorite:
-                miniint = 3;
+                int miniInt = 3;
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    // Recieve data from activity.
+    // Receive data from activity.
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -140,6 +155,19 @@ public class FlickrPhotoListActivity extends Activity implements FlickrPhotoList
                 }
             }
         }
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String s) {
+        return false;
+    }
+
+    // If the text changes it will sent it to adapter.
+    @Override
+    public boolean onQueryTextChange(String s) {
+        FlickrPhotoListFragment flickrPhotoListFragment = (FlickrPhotoListFragment) getFragmentManager().findFragmentById(R.id.daListFrag);
+        flickrPhotoListFragment.onSearching(s);
+        return false;
     }
 
     // Checks if there is a valid network.

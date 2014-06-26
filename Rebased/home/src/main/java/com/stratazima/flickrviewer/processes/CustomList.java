@@ -13,6 +13,7 @@ import com.stratazima.flickrviewer.home.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 /**
  * Project FlickrViewer
@@ -54,6 +55,4 @@ public class CustomList extends ArrayAdapter<String> {
         ratingBar.setRating(Float.parseFloat(daArrayList.get(position).get("rating")));
         return rowView;
     }
-
-
 }

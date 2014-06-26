@@ -10,21 +10,24 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="@string/username"
-            android:id="@+id/textView"/>
+            android:id="@+id/textView" android:layout_marginTop="20dp" android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"/>
     <EditText
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/username_editText"/>
+            android:id="@+id/username_editText" android:hint="@string/exampleUser" android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="@string/password"
-            android:id="@+id/textView2"/>
+            android:id="@+id/textView2" android:layout_marginLeft="20dp" android:layout_marginRight="20dp"/>
     <EditText
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:ems="6"
-            android:id="@+id/password_editText"/>
+            android:id="@+id/password_editText" android:layout_marginBottom="20dp" android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"/>
 </LinearLayout>
