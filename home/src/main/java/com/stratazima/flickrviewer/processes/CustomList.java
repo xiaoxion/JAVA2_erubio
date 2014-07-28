@@ -54,6 +54,4 @@ public class CustomList extends ArrayAdapter<String> {
         ratingBar.setRating(Float.parseFloat(daArrayList.get(position).get("rating")));
         return rowView;
     }
-
-
 }
